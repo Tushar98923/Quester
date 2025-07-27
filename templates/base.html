@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="{{ current_user.theme if current_user.is_authenticated else 'light' }}" 
+      style="--accent-color: {{ current_user.accent_color if current_user.is_authenticated else '#007AFF' }};">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %} - MyQuest</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Dark theme (default) */
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2d2d2d;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --accent-color: {{ current_user.accent_color if current_user.is_authenticated else '#007AFF' }};
+            --accent-color-light: rgba(var(--accent-color-rgb), 0.1);
+            --border-color: #404040;
+            --card-bg: #2d2d2d;
+            --header-bg: #1a1a1a;
+            --hover-bg: #404040;
+            --input-bg: #404040;
+            --error-color: #ff3b30;
+            --success-color: #34c759;
+            
+            /* Main colors */
+            --primary: var(--accent-color);
+            --secondary: var(--accent-color);
+            --accent: var(--accent-color);
+            --background: #F5F7FA;
+            --text: #333333;
+            --cardBackground: #FFFFFF;
+            --shadowColor: rgba(0, 0, 0, 0.1);
+            --success: #34C759;
+            --danger: #FF3B30;
+            --warning: #FF9500;
+            --info: #5AC8FA;
+            
+            /* Theme-specific colors */
+            --header-gradient-start: var(--accent-color);
+            --header-gradient-end: var(--accent-color);
+            --trending-bg: var(--accent-color);
+            --recommended-bg: var(--accent-color);
+            --search-bg: #E5E7EB;
+            --search-icon: var(--accent-color);
+            --categories-bg: var(--accent-color);
+            --create-post-bg: var(--accent-color);
+
+            /* Dynamic text colors */
+            --accent-text-color: #ffffff;
+            --accent-hover-text-color: #ffffff;
+            
+            /* Accent color variations */
+            --accent-color-rgb: 0, 122, 255;
+            --accent-color-hover: var(--accent-color);
+            --accent-color-active: var(--accent-color);
+            --accent-color-focus: var(--accent-color);
+
+            /* Hover states */
+            --hover-text-color: var(--text-primary);
+            --hover-bg-color: var(--hover-bg);
+        }
+
+        [data-theme="light"] {
+            /* Main background */
+            --bg-primary: #f5f7fa;
+            --bg-secondary: #ffffff;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            
+            /* Header colors */
+            --header-gradient-start: var(--accent-color);
+            --header-gradient-end: var(--accent-color);
+            --header-bg: linear-gradient(to right, var(--header-gradient-start), var(--header-gradient-end));
+            
+            /* Content blocks */
+            --card-bg: #ffffff;
+            --border-color: #e1e4e8;
+            --hover-bg: #f0f2f5;
+            
+            /* Section headers */
+            --trending-bg: var(--accent-color);
+            --recommended-bg: var(--accent-color);
+            --categories-bg: var(--accent-color);
+            --create-post-bg: var(--accent-color);
+            
+            /* Search and interaction */
+            --search-bg: #E5E7EB;
+            --search-icon: var(--accent-color);
+            
+            /* Status colors */
+            --error-color: #ff3b30;
+            --success-color: #34c759;
+            --warning-color: #ff9500;
+            --info-color: #5ac8fa;
+            
+            /* Input fields */
+            --input-bg: #ffffff;
+
+            /* Hover states */
+            --hover-text-color: var(--text-primary);
+            --hover-bg-color: var(--hover-bg);
+        }
+
+        /* Update hover styles for all interactive elements */
+        .nav-link:hover,
+        .dropdown-item:hover,
+        .list-group-item-action:hover,
+        .btn:hover,
+        .card:hover,
+        .badge:hover {
+            color: var(--hover-text-color) !important;
+            background-color: var(--hover-bg-color) !important;
+        }
+
+        /* Ensure text remains visible in cards on hover */
+        .card:hover .card-title,
+        .card:hover .card-text,
+        .card:hover .text-muted {
+            color: var(--text-primary) !important;
+        }
+
+        /* Ensure text remains visible in list items on hover */
+        .list-group-item-action:hover {
+            color: var(--text-primary) !important;
+        }
+
+        /* Ensure text remains visible in badges on hover */
+        .badge:hover {
+            color: var(--accent-text-color) !important;
+        }
+
+        /* Update specific component styles for light theme */
+        [data-theme="light"] .navbar {
+            background: var(--header-bg);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        [data-theme="light"] .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        [data-theme="light"] .trending-header {
+            background-color: var(--trending-bg);
+            color: #ffffff;
+        }
+
+        [data-theme="light"] .recommended-header {
+            background-color: var(--recommended-bg);
+            color: #ffffff;
+        }
+
+        [data-theme="light"] .categories-header {
+            background-color: var(--categories-bg);
+            color: #ffffff;
+        }
+
+        [data-theme="light"] .search-box {
+            background-color: var(--search-bg);
+        }
+
+        [data-theme="light"] .search-icon {
+            color: var(--search-icon);
+        }
+
+        [data-theme="light"] .btn-primary {
+            background-color: var(--create-post-bg);
+            border-color: var(--create-post-bg);
+            color: #ffffff;
+        }
+
+        [data-theme="light"] .btn-primary:hover {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            color: #ffffff;
+        }
+
+        [data-theme="light"] .form-control {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        [data-theme="light"] .form-control:focus {
+            background-color: var(--input-bg);
+            border-color: var(--accent-color);
+            color: var(--text-primary);
+        }
+
+        [data-theme="light"] .text-muted {
+            color: var(--text-secondary) !important;
+        }
+
+        [data-theme="light"] .border {
+            border-color: var(--border-color) !important;
+        }
+
+        [data-theme="light"] .alert-success {
+            background-color: rgba(52, 199, 89, 0.1);
+            color: var(--success-color);
+        }
+
+        [data-theme="light"] .alert-danger {
+            background-color: rgba(255, 59, 48, 0.1);
+            color: var(--error-color);
+        }
+
+        body {
+            font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background-color: var(--bg-primary);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Header styles */
+        .navbar {
+            background-color: var(--header-bg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: white !important;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover {
+            color: white !important;
+        }
+
+        /* Button styles */
+        .btn-primary {
+            background-color: var(--accent-color) !important;
+            border-color: var(--accent-color) !important;
+            color: var(--accent-text-color) !important;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-color) !important;
+            border-color: var(--accent-color) !important;
+            color: var(--accent-hover-text-color) !important;
+        }
+
+        .btn-outline-primary {
+            color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        .btn-outline-primary:hover {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            color: #ffffff;
+        }
+
+        /* Card styles */
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+        }
+
+        .card-header {
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* Form styles */
+        .form-control {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .form-control:focus {
+            background-color: var(--input-bg);
+            border-color: var(--accent-color);
+            color: var(--text-primary);
+        }
+
+        .form-select {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .form-select:focus {
+            background-color: var(--input-bg);
+            border-color: var(--accent-color);
+            color: var(--text-primary);
+        }
+
+        /* Link styles */
+        a {
+            color: var(--accent-color);
+        }
+
+        a:hover {
+            color: var(--accent-color);
+            opacity: 0.8;
+        }
+
+        /* Text styles */
+        .text-primary {
+            color: var(--accent-color) !important;
+        }
+
+        .text-secondary {
+            color: var(--text-secondary) !important;
+        }
+
+        /* Border styles */
+        .border-primary {
+            border-color: var(--accent-color) !important;
+        }
+
+        /* Background styles */
+        .bg-primary {
+            background-color: var(--accent-color) !important;
+        }
+
+        .bg-secondary {
+            background-color: var(--bg-secondary) !important;
+        }
+
+        /* Custom styles for accent color */
+        .accent-color {
+            color: var(--accent-color);
+        }
+
+        .accent-bg {
+            background-color: var(--accent-color) !important;
+            color: var(--accent-text-color) !important;
+        }
+
+        .accent-bg:hover {
+            background-color: var(--accent-color) !important;
+            color: var(--accent-hover-text-color) !important;
+        }
+
+        .accent-border {
+            border-color: var(--accent-color);
+        }
+
+        /* Ensure text contrast */
+        .btn-primary, .btn-outline-primary:hover, .accent-bg {
+            color: #ffffff !important;
+        }
+
+        .text-primary, .accent-color, a {
+            color: var(--accent-color) !important;
+        }
+
+        /* Font size adjustments */
+        [data-font-size="small"] {
+            font-size: 0.875rem;
+        }
+
+        [data-font-size="medium"] {
+            font-size: 1rem;
+        }
+
+        [data-font-size="large"] {
+            font-size: 1.125rem;
+        }
+
+        /* Accent color elements */
+        .card-header.accent-bg {
+            background-color: var(--accent-color) !important;
+            color: var(--accent-text-color) !important;
+        }
+
+        .badge.bg-primary {
+            background-color: var(--accent-color) !important;
+            color: var(--accent-text-color) !important;
+        }
+
+        /* Update all accent color references */
+        .accent-bg, 
+        .btn-primary,
+        .badge.bg-primary,
+        .nav-pills .nav-link.active,
+        .page-item.active .page-link,
+        .progress-bar,
+        .bg-primary,
+        [class*="btn"].active,
+        .list-group-item.active,
+        .list-group-item.bg-primary {
+            background-color: var(--accent-color) !important;
+            color: var(--accent-text-color) !important;
+            border-color: var(--accent-color) !important;
+        }
+
+        /* Additional selectors for specific buttons */
+        .btn.active,
+        .btn.bg-primary,
+        .btn-check:checked + .btn,
+        .list-group .active {
+            background-color: var(--accent-color) !important;
+            color: var(--accent-text-color) !important;
+            border-color: var(--accent-color) !important;
+        }
+
+        .accent-text,
+        .nav-link:hover,
+        .page-link,
+        .btn-link,
+        .text-primary {
+            color: var(--accent-color) !important;
+        }
+
+        .accent-border,
+        .form-control:focus,
+        .form-select:focus,
+        .page-link:focus {
+            border-color: var(--accent-color) !important;
+        }
+
+        /* Hover states */
+        .accent-bg:hover,
+        .btn-primary:hover {
+            background-color: var(--accent-color-hover) !important;
+            color: var(--accent-hover-text-color) !important;
+            border-color: var(--accent-color-hover) !important;
+            opacity: 0.9;
+        }
+
+        /* Active states */
+        .accent-bg:active,
+        .btn-primary:active {
+            background-color: var(--accent-color-active) !important;
+            border-color: var(--accent-color-active) !important;
+        }
+
+        /* Focus states */
+        .accent-bg:focus,
+        .btn-primary:focus {
+            background-color: var(--accent-color-focus) !important;
+            border-color: var(--accent-color-focus) !important;
+            box-shadow: 0 0 0 0.25rem rgba(var(--accent-color-rgb), 0.25) !important;
+        }
+    </style>
+    {% block styles %}{% endblock %}
+</head>
+<body class="{{ 'light-theme' if current_user.is_authenticated and current_user.theme == 'light' else 'dark-theme' }}">
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background: linear-gradient(to right, var(--header-gradient-start), var(--header-gradient-end));">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('home') }}">
+                <i class="fas fa-comments me-2"></i>MyQuest
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'home' %}active{% endif %}" href="{{ url_for('home') }}">
+                            <i class="fas fa-home me-1"></i>Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'explore' %}active{% endif %}" href="{{ url_for('explore') }}">
+                            <i class="fas fa-compass me-1"></i>Explore
+                        </a>
+                    </li>
+                    {% if current_user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'notifications' %}active{% endif %}" href="{{ url_for('notifications') }}">
+                            <i class="fas fa-bell me-1"></i>Notifications
+                            {% if unread_notifications_count is defined and unread_notifications_count > 0 %}
+                            <span class="badge bg-danger rounded-pill">{{ unread_notifications_count }}</span>
+                            {% endif %}
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+                <form class="d-flex me-3" action="{{ url_for('search') }}" method="GET" id="nav-search-form" onsubmit="return validateSearch(event)">
+                    <div class="input-group position-relative">
+                        <input class="form-control" type="search" name="q" id="nav-search-input" placeholder="Search posts and users..." aria-label="Search" autocomplete="off" minlength="1" required>
+                        <button class="btn btn-outline-light" type="submit" aria-label="Search">
+                            <i class="fas fa-search"></i>
+                        </button>
+                        
+                        <!-- Autocomplete Suggestions -->
+                        <div id="nav-search-suggestions" class="suggestions-container d-none">
+                            <div class="suggestions-content">
+                                <div id="nav-user-suggestions" class="suggestion-group">
+                                    <h6 class="suggestion-header">Users</h6>
+                                    <div id="nav-user-suggestions-list" class="suggestion-list"></div>
+                                </div>
+                                <div id="nav-post-suggestions" class="suggestion-group">
+                                    <h6 class="suggestion-header">Posts</h6>
+                                    <div id="nav-post-suggestions-list" class="suggestion-list"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <ul class="navbar-nav">
+                    {% if current_user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="avatar-container me-2">
+                                {% if current_user.avatar %}
+                                <img src="{{ url_for('static', filename='avatars/' + current_user.avatar) }}" alt="Profile" class="avatar-img">
+                                {% else %}
+                                <div class="avatar-placeholder">
+                                    {{ current_user.username[:2].upper() }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <span class="d-none d-md-inline">{{ current_user.username }}</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="{{ url_for('profile') }}"><i class="fas fa-user me-2"></i>Profile</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('settings') }}"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                        </ul>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('login') }}">
+                            <i class="fas fa-sign-in-alt me-1"></i>Login
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('register') }}">
+                            <i class="fas fa-user-plus me-1"></i>Register
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5 pt-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <main class="py-4">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5>About Us</h5>
+                    <p>A modern forum application built with Flask and Bootstrap, inspired by Reddit with an Apple-inspired design.</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url_for('home') }}" class="text-decoration-none">Home</a></li>
+                        <li><a href="#" class="text-decoration-none">Explore</a></li>
+                        <li><a href="#" class="text-decoration-none">Help</a></li>
+                        <li><a href="#" class="text-decoration-none">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5>Connect With Us</h5>
+                    <div class="d-flex gap-3 fs-4">
+                        <a href="#" class="text-decoration-none"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-decoration-none"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="text-decoration-none"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-decoration-none"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class="text-center">
+                <p class="mb-0">&copy; 2023 MyQuest. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-dismiss flash messages after 3 seconds
+            const flashMessages = document.querySelectorAll('.alert');
+            flashMessages.forEach(function(alert) {
+                setTimeout(function() {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }, 3000);
+            });
+            
+            // Add form validation function
+            window.validateSearch = function(event) {
+                const searchInput = document.getElementById('nav-search-input');
+                if (!searchInput.value.trim()) {
+                    event.preventDefault();
+                    return false;
+                }
+                return true;
+            };
+            
+            // Initialize TinyMCE if it exists on the page
+            if (typeof tinymce !== 'undefined') {
+                tinymce.init({
+                    selector: '.tinymce',
+                    height: 300,
+                    plugins: 'link lists image code table',
+                    toolbar: 'undo redo | formatselect | bold italic | alignleft aligncenter alignright | bullist numlist | link image | code',
+                    content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 14px; }'
+                });
+            }
+            
+            // Search suggestions functionality
+            const navSearchInput = document.getElementById('nav-search-input');
+            const navSearchSuggestions = document.getElementById('nav-search-suggestions');
+            const navUserSuggestionsList = document.getElementById('nav-user-suggestions-list');
+            const navPostSuggestionsList = document.getElementById('nav-post-suggestions-list');
+            const navUserSuggestionsGroup = document.getElementById('nav-user-suggestions');
+            const navPostSuggestionsGroup = document.getElementById('nav-post-suggestions');
+            
+            let navDebounceTimer;
+            const navDebounceDelay = 300; // milliseconds
+            
+            // Function to fetch suggestions
+            function fetchNavSuggestions(query) {
+                if (query.length < 2) {
+                    navSearchSuggestions.classList.add('d-none');
+                    return;
+                }
+                
+                fetch(`/search/suggestions?q=${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Clear previous suggestions
+                        navUserSuggestionsList.innerHTML = '';
+                        navPostSuggestionsList.innerHTML = '';
+                        
+                        // Display user suggestions
+                        if (data.users.length > 0) {
+                            navUserSuggestionsGroup.classList.remove('d-none');
+                            data.users.forEach(user => {
+                                const userItem = document.createElement('div');
+                                userItem.className = 'suggestion-item suggestion-item-user';
+                                userItem.innerHTML = `
+                                    <div class="suggestion-avatar">${user.username.substring(0, 2).toUpperCase()}</div>
+                                    <div>
+                                        <div>${user.username}</div>
+                                        <small class="text-muted">User</small>
+                                    </div>
+                                `;
+                                userItem.addEventListener('click', () => {
+                                    window.location.href = user.url;
+                                });
+                                navUserSuggestionsList.appendChild(userItem);
+                            });
+                        } else {
+                            navUserSuggestionsGroup.classList.add('d-none');
+                        }
+                        
+                        // Display post suggestions
+                        if (data.posts.length > 0) {
+                            navPostSuggestionsGroup.classList.remove('d-none');
+                            data.posts.forEach(post => {
+                                const postItem = document.createElement('div');
+                                postItem.className = 'suggestion-item';
+                                postItem.innerHTML = `
+                                    <div>${post.title}</div>
+                                    <small class="text-muted">By ${post.author}</small>
+                                `;
+                                postItem.addEventListener('click', () => {
+                                    window.location.href = post.url;
+                                });
+                                navPostSuggestionsList.appendChild(postItem);
+                            });
+                        } else {
+                            navPostSuggestionsGroup.classList.add('d-none');
+                        }
+                        
+                        // Show suggestions if we have any
+                        if (data.users.length > 0 || data.posts.length > 0) {
+                            navSearchSuggestions.classList.remove('d-none');
+                        } else {
+                            navSearchSuggestions.classList.add('d-none');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching suggestions:', error);
+                        navSearchSuggestions.classList.add('d-none');
+                    });
+            }
+            
+            // Event listener for input changes with debouncing
+            if (navSearchInput) {
+                navSearchInput.addEventListener('input', function() {
+                    clearTimeout(navDebounceTimer);
+                    navDebounceTimer = setTimeout(() => {
+                        fetchNavSuggestions(this.value);
+                    }, navDebounceDelay);
+                });
+                
+                // Hide suggestions when clicking outside
+                document.addEventListener('click', function(event) {
+                    if (!navSearchInput.contains(event.target) && !navSearchSuggestions.contains(event.target)) {
+                        navSearchSuggestions.classList.add('d-none');
+                    }
+                });
+                
+                // Show suggestions when focusing on the input if there's a value
+                navSearchInput.addEventListener('focus', function() {
+                    if (this.value.length >= 2) {
+                        fetchNavSuggestions(this.value);
+                    }
+                });
+                
+                // Handle keyboard navigation
+                navSearchInput.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape') {
+                        navSearchSuggestions.classList.add('d-none');
+                    }
+                });
+            }
+        });
+
+        // Color utility functions
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : null;
+        }
+
+        function rgbToHsl(r, g, b) {
+            r /= 255;
+            g /= 255;
+            b /= 255;
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+
+            if (max === min) {
+                h = s = 0;
+            } else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                    case g: h = (b - r) / d + 2; break;
+                    case b: h = (r - g) / d + 4; break;
+                }
+                h /= 6;
+            }
+
+            return { h: h * 360, s: s * 100, l: l * 100 };
+        }
+
+        function hslToRgb(h, s, l) {
+            s /= 100;
+            l /= 100;
+            const c = (1 - Math.abs(2 * l - 1)) * s;
+            const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+            const m = l - c / 2;
+            let r, g, b;
+
+            if (h < 60) { r = c; g = x; b = 0; }
+            else if (h < 120) { r = x; g = c; b = 0; }
+            else if (h < 180) { r = 0; g = c; b = x; }
+            else if (h < 240) { r = 0; g = x; b = c; }
+            else if (h < 300) { r = x; g = 0; b = c; }
+            else { r = c; g = 0; b = x; }
+
+            return {
+                r: Math.round((r + m) * 255),
+                g: Math.round((g + m) * 255),
+                b: Math.round((b + m) * 255)
+            };
+        }
+
+        function rgbToHex(r, g, b) {
+            return '#' + [r, g, b].map(x => {
+                const hex = x.toString(16);
+                return hex.length === 1 ? '0' + hex : hex;
+            }).join('');
+        }
+
+        function getContrastTextColor(hexColor) {
+            const rgb = hexToRgb(hexColor);
+            const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+            
+            // If the color is light (increased threshold from 50 to 60 for better detection)
+            if (hsl.l > 60) {
+                // Return a darker color (decreased from 20 to 15 for darker text)
+                const darkRgb = hslToRgb(hsl.h, Math.min(hsl.s, 80), 15);
+                return rgbToHex(darkRgb.r, darkRgb.g, darkRgb.b);
+            }
+            // If the color is dark
+            else {
+                // Return a lighter color (increased from 80 to 95 for brighter text)
+                const lightRgb = hslToRgb(hsl.h, Math.min(hsl.s, 70), 95);
+                return rgbToHex(lightRgb.r, lightRgb.g, lightRgb.b);
+            }
+        }
+
+        function updateAccentColors() {
+            const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim();
+            const textColor = getContrastTextColor(accentColor);
+            
+            // Convert accent color to RGB for rgba values
+            const rgb = hexToRgb(accentColor);
+            const rgbString = `${rgb.r}, ${rgb.g}, ${rgb.b}`;
+            
+            // Update all color variables
+            document.documentElement.style.setProperty('--accent-color', accentColor);
+            document.documentElement.style.setProperty('--accent-color-rgb', rgbString);
+            document.documentElement.style.setProperty('--accent-text-color', textColor);
+            document.documentElement.style.setProperty('--accent-hover-text-color', textColor);
+            document.documentElement.style.setProperty('--primary', accentColor);
+            document.documentElement.style.setProperty('--secondary', accentColor);
+            document.documentElement.style.setProperty('--accent', accentColor);
+            document.documentElement.style.setProperty('--header-gradient-start', accentColor);
+            document.documentElement.style.setProperty('--header-gradient-end', accentColor);
+            document.documentElement.style.setProperty('--trending-bg', accentColor);
+            document.documentElement.style.setProperty('--recommended-bg', accentColor);
+            document.documentElement.style.setProperty('--categories-bg', accentColor);
+            document.documentElement.style.setProperty('--create-post-bg', accentColor);
+            document.documentElement.style.setProperty('--search-icon', accentColor);
+            
+            // Force update on specific elements that might not catch the CSS variable change
+            document.querySelectorAll('.accent-bg, .btn-primary, .badge.bg-primary, .bg-primary, .btn.active, [class*="btn"].active, .list-group-item.active, .list-group-item.bg-primary').forEach(el => {
+                el.style.backgroundColor = accentColor;
+                el.style.color = textColor;
+                el.style.borderColor = accentColor;
+            });
+        }
+
+        // Update colors when accent color changes
+        document.addEventListener('DOMContentLoaded', updateAccentColors);
+        
+        // Watch for changes in the accent color input
+        const accentColorInput = document.getElementById('accent_color');
+        if (accentColorInput) {
+            accentColorInput.addEventListener('input', function() {
+                document.documentElement.style.setProperty('--accent-color', this.value);
+                updateAccentColors();
+            });
+        }
+
+        // Share functionality
+        async function shareContent(postId, commentId = null) {
+            try {
+                // Create the snippet
+                const response = await fetch('/api/share', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        post_id: postId,
+                        comment_id: commentId
+                    })
+                });
+                
+                const data = await response.json();
+                
+                // Check if the Web Share API is available
+                if (navigator.share) {
+                    await navigator.share({
+                        title: 'Shared Content',
+                        text: 'Check out this content on MyQuest',
+                        url: data.url
+                    });
+                } else {
+                    // Fallback: Copy to clipboard
+                    await navigator.clipboard.writeText(data.url);
+                    
+                    // Show success message
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = 'alert alert-success alert-dismissible fade show';
+                    alertDiv.setAttribute('role', 'alert');
+                    alertDiv.innerHTML = `
+                        Link copied to clipboard!
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    `;
+                    
+                    // Insert the alert at the top of the main content
+                    const mainContent = document.querySelector('main');
+                    mainContent.insertBefore(alertDiv, mainContent.firstChild);
+                    
+                    // Auto dismiss after 3 seconds
+                    setTimeout(() => {
+                        const bsAlert = new bootstrap.Alert(alertDiv);
+                        bsAlert.close();
+                    }, 3000);
+                }
+            } catch (error) {
+                console.error('Error sharing content:', error);
+                // Show error message
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+                alertDiv.setAttribute('role', 'alert');
+                alertDiv.innerHTML = `
+                    Error sharing content. Please try again.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                `;
+                
+                const mainContent = document.querySelector('main');
+                mainContent.insertBefore(alertDiv, mainContent.firstChild);
+                
+                setTimeout(() => {
+                    const bsAlert = new bootstrap.Alert(alertDiv);
+                    bsAlert.close();
+                }, 3000);
+            }
+        }
+        
+        // Add click event listeners to share buttons
+        document.addEventListener('DOMContentLoaded', function() {
+            // For post sharing
+            document.querySelectorAll('[data-share-post]').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const postId = this.getAttribute('data-share-post');
+                    shareContent(postId);
+                });
+            });
+            
+            // For comment sharing
+            document.querySelectorAll('[data-share-comment]').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const commentId = this.getAttribute('data-share-comment');
+                    const postId = this.getAttribute('data-post-id');
+                    shareContent(postId, commentId);
+                });
+            });
+        });
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html> 

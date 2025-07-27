@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Shared Comment - Forum{% endblock %}
+
+{% block content %}
+<div class="share-container">
+    <div class="share-header">
+        <h1>Shared Comment</h1>
+        <a href="{{ url_for('post', post_id=comment.post.id) }}" class="original-post-link">
+            View Original Post
+        </a>
+    </div>
+
+    <div class="shared-content">
+        <div class="post-preview">
+            <h2>{{ comment.post.title }}</h2>
+            <div class="post-meta">
+                <span class="post-author">
+                    <i class="fas fa-user"></i> {{ comment.post.author.username }}
+                </span>
+                <span class="post-date">
+                    <i class="fas fa-clock"></i> {{ comment.post.timestamp.strftime('%Y-%m-%d %H:%M') }}
+                </span>
+            </div>
+        </div>
+
+        <div class="comment-snippet">
+            <div class="comment-header">
+                <div class="comment-author">
+                    <i class="fas fa-user"></i> {{ comment.author.username }}
+                </div>
+                <div class="comment-date">
+                    <i class="fas fa-clock"></i> {{ comment.timestamp.strftime('%Y-%m-%d %H:%M') }}
+                </div>
+            </div>
+            <div class="comment-content">
+                {{ comment.content }}
+            </div>
+            <div class="comment-stats">
+                <span class="stat">
+                    <i class="fas fa-check"></i> {{ comment.ticks }}
+                </span>
+                <span class="stat">
+                    <i class="fas fa-thumbs-up"></i> {{ comment.likes }}
+                </span>
+                <span class="stat">
+                    <i class="fas fa-thumbs-down"></i> {{ comment.dislikes }}
+                </span>
+                <span class="stat">
+                    <i class="fas fa-reply"></i> {{ comment.replies|length }}
+                </span>
+            </div>
+        </div>
+
+        <div class="share-actions">
+            <button class="share-button" onclick="copyShareLink()">
+                <i class="fas fa-link"></i> Copy Share Link
+            </button>
+            <div class="share-link" id="shareLink" style="display: none;">
+                {{ request.url }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyShareLink() {
+    const shareLink = document.getElementById('shareLink');
+    shareLink.style.display = 'block';
+    shareLink.select();
+    document.execCommand('copy');
+    shareLink.style.display = 'none';
+    
+    const button = document.querySelector('.share-button');
+    const originalText = button.innerHTML;
+    button.innerHTML = '<i class="fas fa-check"></i> Link Copied!';
+    setTimeout(() => {
+        button.innerHTML = originalText;
+    }, 2000);
+}
+</script>
+{% endblock %} 

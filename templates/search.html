@@ -1,0 +1,287 @@
+{% extends "base.html" %}
+
+{% block title %}Search Results{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <h1 class="mb-4"><i class="fas fa-search me-2"></i>Search Results</h1>
+            
+            <!-- Search Form -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form action="{{ url_for('search') }}" method="GET" id="search-form">
+                        <div class="input-group">
+                            <input type="text" name="q" id="search-input" class="form-control" placeholder="Search posts and users..." value="{{ query }}" autocomplete="off">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <!-- Autocomplete Suggestions -->
+                    <div id="search-suggestions" class="suggestions-container d-none">
+                        <div class="suggestions-content">
+                            <div id="user-suggestions" class="suggestion-group">
+                                <h6 class="suggestion-header">Users</h6>
+                                <div id="user-suggestions-list" class="suggestion-list"></div>
+                            </div>
+                            <div id="post-suggestions" class="suggestion-group">
+                                <h6 class="suggestion-header">Posts</h6>
+                                <div id="post-suggestions-list" class="suggestion-list"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Search Results -->
+            {% if query %}
+                <h2 class="mb-3">Results for "{{ query }}"</h2>
+                
+                <!-- User Results -->
+                {% if users %}
+                    <h3 class="mb-3 mt-4">Users</h3>
+                    <div class="list-group mb-4">
+                        {% for user in users %}
+                            <a href="{{ url_for('user_profile', username=user.username) }}" class="list-group-item list-group-item-action">
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-placeholder me-3">
+                                        {{ user.username[:2].upper() }}
+                                    </div>
+                                    <div>
+                                        <h5 class="mb-1">{{ user.username }}</h5>
+                                        <small class="text-muted">Member since {{ user.join_date.strftime('%B %Y') }}</small>
+                                    </div>
+                                </div>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <!-- Post Results -->
+                {% if posts %}
+                    <h3 class="mb-3 mt-4">Posts</h3>
+                    <div class="list-group">
+                        {% for post in posts %}
+                            <a href="{{ url_for('post', post_id=post.id) }}" class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h5 class="mb-1">{{ post.title }}</h5>
+                                    <small class="text-muted">{{ post.timestamp.strftime('%Y-%m-%d') }}</small>
+                                </div>
+                                <p class="mb-1">{{ post.content[:200] }}{% if post.content|length > 200 %}...{% endif %}</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small>Posted by {{ post.author.username }}</small>
+                                    <div>
+                                        <span class="badge bg-primary me-2"><i class="fas fa-thumbs-up"></i> {{ post.likes }}</span>
+                                        <span class="badge bg-secondary"><i class="fas fa-comment"></i> {{ post.comments|length }}</span>
+                                    </div>
+                                </div>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                {% if not posts and not users %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i> No results found for "{{ query }}".
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i> Enter a search term to find posts and users.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .avatar-placeholder {
+        width: 40px;
+        height: 40px;
+        background-color: var(--accent-color);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+    
+    .suggestions-container {
+        position: absolute;
+        width: 100%;
+        max-height: 300px;
+        overflow-y: auto;
+        z-index: 1000;
+        background-color: white;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .suggestions-content {
+        padding: 10px;
+    }
+    
+    .suggestion-group {
+        margin-bottom: 10px;
+    }
+    
+    .suggestion-header {
+        padding: 5px 10px;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+    
+    .suggestion-list {
+        max-height: 150px;
+        overflow-y: auto;
+    }
+    
+    .suggestion-item {
+        padding: 8px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    
+    .suggestion-item:hover {
+        background-color: #f0f0f0;
+    }
+    
+    .suggestion-item-user {
+        display: flex;
+        align-items: center;
+    }
+    
+    .suggestion-avatar {
+        width: 30px;
+        height: 30px;
+        background-color: var(--accent-color);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        margin-right: 10px;
+        font-size: 0.8rem;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('search-input');
+        const searchSuggestions = document.getElementById('search-suggestions');
+        const userSuggestionsList = document.getElementById('user-suggestions-list');
+        const postSuggestionsList = document.getElementById('post-suggestions-list');
+        const userSuggestionsGroup = document.getElementById('user-suggestions');
+        const postSuggestionsGroup = document.getElementById('post-suggestions');
+        
+        let debounceTimer;
+        const debounceDelay = 300; // milliseconds
+        
+        // Function to fetch suggestions
+        function fetchSuggestions(query) {
+            if (query.length < 2) {
+                searchSuggestions.classList.add('d-none');
+                return;
+            }
+            
+            fetch(`/search/suggestions?q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Clear previous suggestions
+                    userSuggestionsList.innerHTML = '';
+                    postSuggestionsList.innerHTML = '';
+                    
+                    // Display user suggestions
+                    if (data.users.length > 0) {
+                        userSuggestionsGroup.classList.remove('d-none');
+                        data.users.forEach(user => {
+                            const userItem = document.createElement('div');
+                            userItem.className = 'suggestion-item suggestion-item-user';
+                            userItem.innerHTML = `
+                                <div class="suggestion-avatar">${user.username.substring(0, 2).toUpperCase()}</div>
+                                <div>
+                                    <div>${user.username}</div>
+                                    <small class="text-muted">User</small>
+                                </div>
+                            `;
+                            userItem.addEventListener('click', () => {
+                                window.location.href = user.url;
+                            });
+                            userSuggestionsList.appendChild(userItem);
+                        });
+                    } else {
+                        userSuggestionsGroup.classList.add('d-none');
+                    }
+                    
+                    // Display post suggestions
+                    if (data.posts.length > 0) {
+                        postSuggestionsGroup.classList.remove('d-none');
+                        data.posts.forEach(post => {
+                            const postItem = document.createElement('div');
+                            postItem.className = 'suggestion-item';
+                            postItem.innerHTML = `
+                                <div>${post.title}</div>
+                                <small class="text-muted">By ${post.author}</small>
+                            `;
+                            postItem.addEventListener('click', () => {
+                                window.location.href = post.url;
+                            });
+                            postSuggestionsList.appendChild(postItem);
+                        });
+                    } else {
+                        postSuggestionsGroup.classList.add('d-none');
+                    }
+                    
+                    // Show suggestions if we have any
+                    if (data.users.length > 0 || data.posts.length > 0) {
+                        searchSuggestions.classList.remove('d-none');
+                    } else {
+                        searchSuggestions.classList.add('d-none');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching suggestions:', error);
+                    searchSuggestions.classList.add('d-none');
+                });
+        }
+        
+        // Event listener for input changes with debouncing
+        searchInput.addEventListener('input', function() {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                fetchSuggestions(this.value);
+            }, debounceDelay);
+        });
+        
+        // Hide suggestions when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!searchInput.contains(event.target) && !searchSuggestions.contains(event.target)) {
+                searchSuggestions.classList.add('d-none');
+            }
+        });
+        
+        // Show suggestions when focusing on the input if there's a value
+        searchInput.addEventListener('focus', function() {
+            if (this.value.length >= 2) {
+                fetchSuggestions(this.value);
+            }
+        });
+        
+        // Handle keyboard navigation
+        searchInput.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                searchSuggestions.classList.add('d-none');
+            }
+        });
+    });
+</script>
+{% endblock %} 

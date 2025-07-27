@@ -1,0 +1,265 @@
+{% extends "base.html" %}
+
+{% block title %}Register - MyQuest{% endblock %}
+
+{% block styles %}
+<style>
+    :root {
+        /* Light mode colors (default) */
+        --auth-bg: #f8fafc;
+        --card-bg: #ffffff;
+        --text-primary: #1e293b;
+        --text-secondary: #64748b;
+        --border-color: #e2e8f0;
+        --input-bg: #ffffff;
+        --input-border: #cbd5e1;
+        --shadow-color: rgba(0, 0, 0, 0.1);
+    }
+
+    /* Dark mode overrides */
+    [data-theme="dark"] {
+        --auth-bg: #1a1a1a;
+        --card-bg: #2d2d2d;
+        --text-primary: #e2e8f0;
+        --text-secondary: #94a3b8;
+        --border-color: #404040;
+        --input-bg: #404040;
+        --input-border: #4a5568;
+        --shadow-color: rgba(0, 0, 0, 0.3);
+    }
+
+    body {
+        background-color: var(--auth-bg);
+    }
+
+    .auth-container {
+        min-height: calc(100vh - 120px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+    }
+
+    .auth-card {
+        width: 100%;
+        max-width: 400px;
+        background-color: var(--card-bg);
+        border-radius: 12px;
+        box-shadow: 0 4px 6px var(--shadow-color);
+        padding: 2rem;
+    }
+
+    .auth-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .auth-header h1 {
+        color: var(--text-primary);
+        font-size: 2rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .auth-header p {
+        color: var(--text-secondary);
+        font-size: 1rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        color: var(--text-primary);
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid var(--input-border);
+        border-radius: 8px;
+        background-color: var(--input-bg);
+        color: var(--text-primary);
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 3px rgba(var(--accent-color-rgb), 0.1);
+    }
+
+    .auth-button {
+        width: 100%;
+        padding: 0.75rem;
+        background-color: var(--accent-color);
+        color: #ffffff;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .auth-button:hover {
+        background-color: var(--accent-hover);
+        transform: translateY(-1px);
+    }
+
+    .auth-links {
+        margin-top: 1.5rem;
+        text-align: center;
+        color: var(--text-secondary);
+    }
+
+    .auth-links a {
+        color: var(--accent-color);
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s ease;
+    }
+
+    .auth-links a:hover {
+        color: var(--accent-hover);
+        text-decoration: underline;
+    }
+
+    .auth-divider {
+        margin: 1.5rem 0;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        color: var(--text-secondary);
+    }
+
+    .auth-divider::before,
+    .auth-divider::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .auth-divider span {
+        padding: 0 1rem;
+    }
+
+    .social-login {
+        display: grid;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .social-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.75rem;
+        border: 2px solid var(--border-color);
+        border-radius: 8px;
+        background-color: var(--input-bg);
+        color: var(--text-primary);
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .social-button:hover {
+        background-color: var(--border-color);
+        transform: translateY(-1px);
+    }
+
+    .password-requirements {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        margin-top: 0.5rem;
+    }
+
+    .password-requirements ul {
+        list-style: none;
+        padding-left: 0;
+        margin: 0.5rem 0 0 0;
+    }
+
+    .password-requirements li {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.25rem;
+        color: var(--text-secondary);
+    }
+
+    .password-requirements i {
+        font-size: 0.75rem;
+        color: var(--accent-color);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1>Create Account</h1>
+            <p>Join MyQuest and start sharing</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('register') }}" class="auth-form">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" class="form-input" required 
+                       placeholder="Choose a username" autocomplete="username"
+                       pattern="[a-zA-Z0-9_]{3,20}" title="Username must be between 3 and 20 characters and can only contain letters, numbers, and underscores">
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" class="form-input" required 
+                       placeholder="Enter your email" autocomplete="email">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" class="form-input" required 
+                       placeholder="Create a password" autocomplete="new-password"
+                       pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$">
+                <div class="password-requirements">
+                    Password requirements:
+                    <ul>
+                        <li><i class="fas fa-check-circle"></i>At least 8 characters long</li>
+                        <li><i class="fas fa-check-circle"></i>Contains at least one letter</li>
+                        <li><i class="fas fa-check-circle"></i>Contains at least one number</li>
+                    </ul>
+                </div>
+            </div>
+
+            <button type="submit" class="auth-button">Create Account</button>
+        </form>
+
+        <div class="auth-divider">
+            <span>or sign up with</span>
+        </div>
+
+        <div class="social-login">
+            <a href="#" class="social-button">
+                <i class="fab fa-google"></i>
+                Sign up with Google
+            </a>
+            <a href="#" class="social-button">
+                <i class="fab fa-github"></i>
+                Sign up with GitHub
+            </a>
+        </div>
+
+        <div class="auth-links">
+            <p>Already have an account? <a href="{{ url_for('login') }}">Sign in</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %} 

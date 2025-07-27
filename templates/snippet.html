@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}Shared Snippet{% endblock %}
+
+{% block styles %}
+<style>
+    /* Reset default styles */
+    body {
+        margin: 0;
+        padding: 0;
+        background: transparent !important;
+    }
+
+    /* Container styles */
+    .snippet-container {
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: var(--card-bg);
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        text-decoration: none;
+        display: block;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .snippet-container:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Post content styles */
+    .post-content {
+        margin-bottom: 20px;
+        line-height: 1.6;
+    }
+
+    .post-title {
+        margin-bottom: 15px;
+        color: var(--text-primary);
+    }
+
+    .post-meta {
+        font-size: 0.9em;
+        color: var(--text-secondary);
+        margin-bottom: 15px;
+    }
+
+    /* Comment styles */
+    .comment {
+        margin-top: 20px;
+        padding: 15px;
+        background-color: var(--bg-secondary);
+        border-radius: 6px;
+    }
+
+    .comment-header {
+        margin-bottom: 10px;
+    }
+
+    .comment-author {
+        font-weight: 500;
+        color: var(--text-primary);
+    }
+
+    .comment-timestamp {
+        font-size: 0.85em;
+        color: var(--text-secondary);
+    }
+
+    .comment-content {
+        color: var(--text-primary);
+    }
+
+    /* Hide navigation and footer */
+    .navbar, .footer {
+        display: none !important;
+    }
+
+    /* Override any base template padding/margin */
+    main {
+        padding: 0 !important;
+        margin: 0 !important;
+        background: transparent !important;
+    }
+
+    /* Make sure the base template background is transparent */
+    html, body, .content-wrapper {
+        background: transparent !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<a href="{{ original_url }}" class="snippet-container">
+    <!-- Post Content -->
+    <h2 class="post-title">{{ post.title }}</h2>
+    <div class="post-meta">
+        Posted by {{ post.author.username }} on {{ post.timestamp.strftime('%Y-%m-%d') }}
+    </div>
+    <div class="post-content">
+        {{ post.content|safe }}
+    </div>
+
+    <!-- Comment (if shared) -->
+    {% if comment %}
+    <div class="comment">
+        <div class="comment-header">
+            <span class="comment-author">{{ comment.author.username }}</span>
+            <span class="comment-timestamp">{{ comment.timestamp.strftime('%Y-%m-%d') }}</span>
+        </div>
+        <div class="comment-content">
+            {{ comment.content|safe }}
+        </div>
+    </div>
+    {% endif %}
+</a>
+{% endblock %} 
